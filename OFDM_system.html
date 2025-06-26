@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OFDM System Parameters</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>OFDM System Parameters</h1>
+    
+    <form id="ofdmForm">
+      <section class="form-section">
+        <div class="main-block">
+          <label for="rbBandwidth">Resource Block (RB) Bandwidth (kHz):</label>
+          <input type="number" id="rbBandwidth" name="rbBandwidth" min="1" required>
+        </div>
+
+        <div class="main-block">
+          <label for="subcarrierSpacing">Subcarrier Spacing (kHz):</label>
+          <input type="number" id="subcarrierSpacing" name="subcarrierSpacing" min="1" required>
+        </div>
+
+        <div class="main-block">
+          <label for="numSymbols">Number of OFDM Symbols per RB:</label>
+          <input type="number" id="numSymbols" name="numSymbols" min="1" required>
+        </div>
+
+        <div class="main-block">
+          <label for="rbDuration"> RB Duration (ms):</label>
+          <input type="text" id="rbDuration" name="rbDuration" required>
+        </div>
+
+        <div class="main-block">
+          <label for="modulationType">Modulation Type:</label>
+          <select id="modulationType" name="modulationType" required>
+            <option value="">Select modulation</option>
+            <option value="QPSK">QPSK</option>
+            <option value="16-QAM">16-QAM</option>
+            <option value="64-QAM">64-QAM</option>
+            <option value="1024-QAM">1024-QAM</option>
+          </select>
+        </div>
+
+        <div class="main-block">
+          <label for="parallelBlocks">Parallel Transmission Blocks:</label>
+          <input type="number" id="parallelBlocks" name="parallelBlocks" min="1" required>
+        </div>
+      </section>
+
+      <div class="button-group">
+        <button type="submit">Submit</button>
+        <button type="button" onclick="summarizeOFDM()">Summarize Process</button>
+        <button class="nav-button fixed-back-button" onclick="goTo('index.html')">← Back</button>
+    
+      </div>
+
+      <section class="results-section">
+        <h2>Results</h2>
+        <div class="main-block">
+          <label for="outputs">System Results:</label>
+          <div id="outputs" class="output">—</div>
+        </div>
+      </section>
+      <section class="summary-section"> 
+        <div id="summary" class="summary-output"></div>
+      </section>
+    </form>
+  </div>
+
+  <script src="ofdm_script.js"></script>
+</body>
+</html>

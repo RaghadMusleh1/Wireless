@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome | AI Web App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #3a6ea5;
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      font-size: 1.8rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      color: #333;
+    }
+
+    p {
+      color: #555;
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+
+    .dashboard {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .dashboard button {
+      padding: 15px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #3a6ea5;
+      color: white;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .dashboard button:hover {
+      background-color: #2e5990;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 15px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    AI-Powered Web Application for Wireless and Mobile Network Design
+  </header>
+
+  <main>
+    <h2>Welcome!</h2>
+    <p>Select a module to continue:</p>
+
+    <div class="dashboard">
+      <button onclick="goTo('wireless_system.html')">Wireless Communication System</button>
+      <button onclick="goTo('OFDM_system.html')">OFDM Systems</button>
+      <button onclick="goTo('linkBudget.html')">Link Budget Calculation</button>
+      <button onclick="goTo('Cellular.html')">Cellular System Design</button>
+    </div>
+  </main>
+
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+  </script>
+
+</body>
+</html>

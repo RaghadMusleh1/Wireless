@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Link Budget Calculator</title>
+  <link rel="stylesheet" href="pageStyle.css">
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;text-align: center;align-items: center; display: flex; justify-content: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; background-color:#3a6ea5; width: 1485px; height: 100px; color: white;">
+    Link Budget Calculator
+  </h1>
+    <div style="padding-top: 130px;"></div>
+    <div class="top">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Transmitted Power (dBm)</label>
+          <input type="number" id="pt">
+        </div>
+        <div class="form-group">
+          <label>Transmitter Antenna Gain (dBi)</label>
+          <input type="number" id="gt">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Receiver Antenna Gain (dBi)</label>
+          <input type="number" id="gr">
+        </div>
+        <div class="form-group">
+          <label>Distance (km)</label>
+          <input type="number" id="d">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Frequency (MHz)</label>
+          <input type="number" id="f">
+        </div>
+        <div class="form-group">
+          <label>System Losses (dB)</label>
+          <input type="number" id="ls">
+        </div>
+      </div>
+
+      <button onclick="calculateLinkBudget()">Calculate</button>
+    </div>
+    <button style="background-color: #3a6ea5; width: 100px;" onclick="window.location.href='index.html'">Back</button>
+  </div>
+
+  <!-- Error Box -->
+  <div id="errorBox" class="draggable-box">
+    <div class="box-header" id="errorHeader">
+      <span>Error</span>
+      <span class="close-btn" onclick="closeErrorBox()">&times;</span>
+    </div>
+    <div class="box-body"></div>
+  </div>
+
+  <!-- Result Box -->
+  <div id="resultBox" class="draggable-box">
+    <div class="box-header" id="resultHeader">
+      <span>Calculation Result</span>
+      <span class="close-btn" onclick="closeResultBox()">&times;</span>
+    </div>
+    <div class="box-body" id="resultContent"></div>
+  </div>
+
+  <script type="module" src="linkBudget.js"></script>
+</body>
+</html>
