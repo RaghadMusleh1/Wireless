@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wireless System Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Wireless System Calculator</h1>
+
+  <form id="wirelessForm">
+    <!-- Signal Bandwidth -->
+    <div class="main-block">
+      <div class="block">Signal Bandwidth</div>
+      <label for="bandwidth">Enter Input Bandwidth (kHz)</label>
+      <input type="number" id="bandwidth" name="bandwidth" min="0.001" step="any" required>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- Nyquist Sampling Rate -->
+    <div class="main-block">
+      <div class="block">Nyquist Sampling Rate</div>
+      <label class="output-label">Output Sampling Rate (kHz)</label>
+      <div id="result" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- Quantizer -->
+    <div class="main-block">
+      <div class="block">Quantizer</div>
+      <label for="quantizer">Enter Quantizer Bits</label>
+      <input type="number" id="quantizer" name="quantizer" min="1" step="1" required>
+      <div id="quantizer_res" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- Source Encoder -->
+    <div class="main-block">
+      <div class="block">Source Encoder</div>
+      <label for="Rs">Enter Rs</label>
+      <input type="text" id="Rs" name="Rs" min="0" step="0.1" required>
+      <label class="output-label">Output Rate</label>
+      <div id="src_encoder_res" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- Channel Encoder -->
+    <div class="main-block">
+      <div class="block">Channel Encoder</div>
+      <label for="Rc">Enter Rc</label>
+      <input type="text" id="Rc" name="Rc" min="0" step="0.1" required>
+      <label class="output-label">Output Rate</label>
+      <div id="channel_encoder_out" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <!-- Interleaver -->
+    <div class="main-block">
+      <div class="block">Interleaver</div>
+      <label class="output-label">Output Rate</label>
+      <div id="interleaver_out" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+
+
+    <!-- Burst Formatting -->
+    <div class="main-block">
+      <div class="block">Burst Formatting (GSM)</div>
+      <label class="output-label">Output Rate</label>
+      <div id="burst_formatting_out" class="output">—</div>
+    </div>
+
+    <div class="arrow">→</div>
+    <!-- Modulation -->
+
+    <div class="mb-4">
+      <label for="modulationType" class="block text-gray-700 text-sm font-medium mb-2">
+        Modulation Type:
+      </label>
+      <select id="modulationType" name="modulationType" required
+              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option value="">Select modulation</option>
+        <option value="QPSK">QPSK</option>
+        <option value="16-QAM">16-QAM</option>
+        <option value="64-QAM">64QAM</option>
+      </select>
+    </div>
+
+
+
+    <!-- Submit Button -->
+    <button type="submit">Calculate</button>
+    <!-- Back Button -->
+    <button class="nav-button fixed-back-button" onclick="goTo('index.html')">← Back</button>
+    
+    <!-- Summarize Button -->
+    <button type="button" onclick="summarizeProcess()">Summarize Process</button>
+    <div id="summary" style="margin-top: 20px; font-style: italic;"></div>
+
+
+  </form>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
+
+
