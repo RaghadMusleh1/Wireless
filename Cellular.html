@@ -8,41 +8,71 @@
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align: center;text-align: center;align-items: center; display: flex; justify-content: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; background-color: #3a6ea5; width: 1485px; height: 100px; color: antiquewhite;">
+    <h1 style="text-align: center;text-align: center;align-items: center; display: flex; justify-content: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; background-color: #3a6ea5; width: 1485px; height: 100px; color: white;">
     Cellular System Design
   </h1>
     <div style="padding-top: 130px;"></div>
     <div class="top">
       <div class="form-row">
         <div class="form-group">
-          <label>Total Bandwidth (Hz)</label>
-          <input type="number" id="pt">
+          <label>Total Bandwidth</label>
+          <div>
+            <input type="number" id="totBw">
+            <select id="totBwUnit" style="height:30px; width: 60px;">
+                <option value="Hz">Hz</option>
+                <option value="KHz">KHz</option>
+                <option value="MHz">MHz</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
-          <label>Channel Bandwidth (Hz)</label>
-          <input type="number" id="gt">
+          <label>Channel Bandwidth</label>
+          <div>
+            <input type="number" id="ch">
+            <select id="chUnit" style="height:30px; width: 60px;">
+                  <option value="Hz">Hz</option>
+                  <option value="KHz">KHz</option>
+                  <option value="MHz">MHz</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Number Of Cells</label>
-          <input type="number" id="gr">
+          <label style="position:absolute;top: 345px">Number Of Cells</label>
+          <div>
+            <input type="number"  style="position: absolute; left: 23.6%; width: 300px; top: 367px;" id="cells">
+          </div>
         </div>
         <div class="form-group">
-          <label>Distance (km)</label>
-          <input type="number" id="d">
+          <label>Distance</label>
+          <div>
+            <input type="number" id="d">
+            <select id="disUnit" style="height:30px; width: 60px; ">
+              <option value="dBm">Km</option>
+              <option value="dB">m</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Reuse Factor (N)</label>
-          <input type="number" id="f">
+          <label style="position: absolute; top: 429px;">Reuse Factor</label>
+          <div>
+            <input type="number" style="position: absolute; left: 23.6%; width: 300px; top: 450px;"  id="f" > 
+          </div>
         </div>
         <div class="form-group">
-          <label>Cell Radius (m)</label>
-          <input type="number" id="ls">
+          <label>Cell Radius</label>
+          <div>
+            <input type="number" id="r">
+            <select id="rUnit" style="height:30px; width: 60px;">
+                <option value="dBm">Km</option>
+                <option value="dB">m</option>
+            </select>
+          </div>
         </div>
       </div>
 
