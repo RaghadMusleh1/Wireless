@@ -12,43 +12,100 @@
     Link Budget Calculator
   </h1>
     <div style="padding-top: 130px;"></div>
+
     <div class="top">
       <div class="form-row">
         <div class="form-group">
-          <label>Transmitted Power (dBm)</label>
-          <input type="number" id="pt">
+          <label>Transmitted Power</label>
+          <div>
+            <input type="number" id="pt">
+            <select id="ptUnit" style="height:30px; width: 60px;">
+              <option value="dBm">dBm</option>
+              <option value="dB">dB</option>
+              <option value="watt">watt</option>
+            </select>
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Transmitter Antenna Gain (dBi)</label>
-          <input type="number" id="gt">
+          <label>Transmitter Antenna Gain</label>
+          <div>
+            <input type="number" id="gt">
+            <select id="gtUnit" style="height:30px; width: 60px;">
+              <option value="dBm">dBm</option>
+              <option value="dB">dB</option>
+              <option value="watt">watt</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Receiver Antenna Gain (dBi)</label>
-          <input type="number" id="gr">
+          <label>Receiver Antenna Gain</label>
+          <div>
+            <input type="number" id="gr">
+            <select id="grUnit" style="height:30px; width: 60px;">
+              <option value="dBm">dBm</option>
+              <option value="dB">dB</option>
+              <option value="watt">watt</option>
+            </select>
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Distance (km)</label>
-          <input type="number" id="d">
+          <label>Distance</label>
+          <div>
+            <input type="number" id="d">
+            <select id="distanceUnit" style="height:30px; width: 60px;">
+              <option value="km">km</option>
+              <option value="m">m</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Frequency (MHz)</label>
-          <input type="number" id="f">
+          <label>Frequency</label>
+          <div>
+            <input type="number" id="f">
+            <select id="freqUnit" style="height:30px; width: 60px;">
+              <option value="MHz">MHz</option>
+              <option value="GHz">GHz</option>
+              <option value="kHz">kHz</option>
+            </select>
+          </div>
         </div>
+
         <div class="form-group">
-          <label>System Losses (dB)</label>
-          <input type="number" id="ls">
+          <label>System Losses</label>
+          <div>
+            <input type="number" id="ls">
+            <select id="lsUnit" style="height:30px; width: 60px;">
+              <option value="dBm">dBm</option>
+              <option value="dB">dB</option>
+              <option value="watt">watt</option>
+            </select>
+          </div>
         </div>
       </div>
-
-      <button onclick="calculateLinkBudget()">Calculate</button>
+      <div class="form-row">
+        <div>
+          <button style="width: 400px;" onclick="calculateLinkBudget() ">Calculate</button>
+        <select id="unitType" style="height: 30px;width: 60px;">
+          <option value="dbm">dBm</option>
+          <option value="db">dB</option>
+          <option value="watt">Watt</option>
+        </select>
+        </div>
     </div>
+
+    </div>
+
     <button style="background-color: #3a6ea5; width: 100px;" onclick="window.location.href='index.html'">Back</button>
+
+    </div>
   </div>
 
   <!-- Error Box -->
