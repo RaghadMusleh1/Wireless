@@ -3,12 +3,21 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 const ai = new GoogleGenerativeAI("AIzaSyDLEh-QO5r7b9CGRD7oEkv-3sJb2VzkxZU"); 
 
 async function calculateLinkBudget() {
+
   const Pt = parseFloat(document.getElementById('pt').value);
+  const ptUnit = document.getElementById('ptUnit').value;
   const Gt = parseFloat(document.getElementById('gt').value);
+  const gtUnit = document.getElementById('gtUnit').value;
   const Gr = parseFloat(document.getElementById('gr').value);
-  const d = parseFloat(document.getElementById('d').value);
-  const f = parseFloat(document.getElementById('f').value);
+  const grUnit = document.getElementById('grUnit').value;
+  let d = parseFloat(document.getElementById('d').value);
+  const dUnit = document.getElementById('distanceUnit').value;
+  let f = parseFloat(document.getElementById('f').value);
+  const freqUnit = document.getElementById('freqUnit').value;
   const Ls = parseFloat(document.getElementById('ls').value);
+  const lsUnit = document.getElementById('lsUnit').value;
+  const unitType = document.getElementById('unitType').value;
+
 
   if ([Pt, Gt, Gr, d, f, Ls].some(isNaN) || d <= 0 || f <= 0) {
     showErrorBox("Please enter valid positive numbers for all fields.");
@@ -20,29 +29,32 @@ async function calculateLinkBudget() {
   const response = await fetch('/link-budget', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ Pt, Gt, Gr, d, f, Ls })
+    body: JSON.stringify({
+      Pt, Gt, Gr, d, f, Ls,
+      lsUnit, freqUnit, dUnit,
+      grUnit, gtUnit, ptUnit, unitType
+    })
   });
 
   const data = await response.json();
-
-  const prValue = parseFloat(data.pr);
-  const summary = data.summary; 
-
+  const stepsList = data.summary.map(step => `<li>${step}</li>`).join("");
   const explanation = `
-    📶 <strong>Received Power: ${prValue} dBm</strong><br><br>
-    ${summary}<br><br>
+    <strong>Received Power: ${data.pr.toFixed(2)} dBm</strong><br><br>
+    <strong>Steps:</strong>
+    <ul>${stepsList}</ul><br>
     ${
-      prValue > -70
-        ? "✅ Strong signal."
-        : prValue > -90
-        ? "⚠️ Acceptable signal."
-        : "❌ Weak signal."
+      data.pr > -70
+        ? "Strong signal."
+        : data.pr > -90
+        ? "Acceptable signal."
+        : "Weak signal."
     }
   `;
 
+
   showResultBox(explanation);
   } catch (err) {
-    showErrorBox("❌ Error: " + err.message);
+    showErrorBox("Error: " + err.message);
   }
 
 }
@@ -91,7 +103,6 @@ function makeDraggable(boxId, headerId) {
 makeDraggable("errorBox", "errorHeader");
 makeDraggable("resultBox", "resultHeader");
 
-// attach functions to global window so HTML button can access them
 window.calculateLinkBudget = calculateLinkBudget;
 window.closeErrorBox = closeErrorBox;
 window.closeResultBox = closeResultBox;
