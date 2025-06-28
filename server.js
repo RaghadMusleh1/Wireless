@@ -111,7 +111,7 @@ app.post('/summarizeofdm', async (req, res) => {
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      const text = await response.text(); // Need to await this call
+      const text = await response.text();
 
       res.json({ summary: text });
     } catch (err) {
@@ -120,52 +120,111 @@ app.post('/summarizeofdm', async (req, res) => {
     }
 });
 
+
 app.post('/link-budget', async (req, res) => {
-  const { Pt, Gt, Gr, d, f, Ls } = req.body;
+  let { Pt, Gt, Gr, d, f, Ls, lsUnit, freqUnit, dUnit, grUnit, gtUnit, ptUnit, unitType} = req.body;
+
+  if (dUnit === 'm') d = d / 1000;
+
+  if (freqUnit === 'GHz') f = f * 1000;
+  if (freqUnit === 'KHz') f = f / 1000;
+
+  const toDbm = (value, unit) => {
+    if (unit === 'watt') return 10 * Math.log10(value * 1000);
+    if (unit === 'dbm') return v - 30; 
+    return parseFloat(value); 
+  };
+
+  Pt = toDbm(Pt, ptUnit);
+  Gt = toDbm(Gt, gtUnit);
+  Gr = toDbm(Gr, grUnit);
+  Ls = toDbm(Ls, lsUnit);
+
+  const Lp = 20 * Math.log10(d) + 20 * Math.log10(f) + 32.44;
+  const Pr = Pt + Gt + Gr - Lp - Ls;
+
+  if (unitType === 'dbm') Pr = Pr + 30;
+  if (unitType === 'watt') Pr = Math.pow(10, (Pr + 30) / 10) / 1000;
 
   const prompt = `
-Calculate the received power (Pr) using the following values:
+  Inputs for received power (Pr) calculation:
 
-Pt = ${Pt}
-Gt = ${Gt}
-Gr = ${Gr}
-d = ${d} km
-f = ${f} MHz
-Ls = ${Ls}
+  Pt = ${Pt}
+  Gt = ${Gt}
+  Gr = ${Gr}
+  d = ${d} km
+  f = ${f} MHz
+  Ls = ${Ls}
 
-Use the formulas:
-Lp = 20 * log10(d) + 20 * log10(f) + 32.44
-Pr = Pt + Gt + Gr - Lp - Ls
+  The formulas used are:
+  Lp = 20 * log10(d) + 20 * log10(f) + 32.44
+  Pr = Pt + Gt + Gr - Lp - Ls
 
-Return ONLY a raw JSON object like this:
-{"summary": "Short explanation of the calculation", "value": Pr value as number}
-Do NOT include \`\`\` or any formatting.
-`;
+  Write a short, 2-step summary of how data flows through this system and the numbers after each step.
+  Use simple language for a student to understand.
+  Number the steps clearly and return ONLY a raw JSON object with the following fields and no extra text or formatting:
+  {
+    "summary": [
+      "Step 1: description with value",
+      "Step 2: description with value",
+    ],
+    "pr" : ${Pr}
+  }`;
 
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = (await response.text()).trim();
 
+      const cleanedText = text
+        .replace(/```json\s*/g, '')
+        .replace(/```/g, '');
 
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(cleanedText);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", cleanedText);
+        return res.status(500).json({ error: "Failed to parse Gemini response." });
+      }
 
-    const jsonOutput = JSON.parse(text);
-
-    res.json({
-      pr: jsonOutput.value,
-      summary: jsonOutput.summary
-    });
-  } catch (err) {
-    console.error('Gemini Error:', err);
-    res.status(500).json({ error: 'Failed to calculate Pr using Gemini.' });
-  }
+      res.json(data);
+    } catch (err) {
+      console.error("Gemini API Error:", err);
+      res.status(500).json({ error: "Gemini API failed" });
+    }
 });
 
 
 
+
+
 app.post('/cellular-system', async (req, res) => {
-  const { totalBW, channelBW, numberOfCells, reuseFactor, cellRadius } = req.body;
+  let {
+    totalBW, totalBwUnit,
+    channelBW, chUnit,
+    numberOfCells,
+    reuseFactor,
+    cellRadius, rUnit
+  } = req.body;
+
+  const unitToHz = {
+    Hz: 1,
+    KHz: 1e3,
+    MHz: 1e6
+  };
+
+  const unitToMeters = {
+    m: 1,
+    km: 1000
+  };
+
+  totalBW = parseFloat(totalBW) * (unitToHz[totalBwUnit] || 1);
+  channelBW = parseFloat(channelBW) * (unitToHz[chUnit] || 1);
+  cellRadius = parseFloat(cellRadius) * (unitToMeters[rUnit] || 1);
+  numberOfCells = parseFloat(numberOfCells);
+  reuseFactor = parseFloat(reuseFactor);
 
   if ([totalBW, channelBW, numberOfCells, reuseFactor, cellRadius].some(v => isNaN(v))) {
     return res.status(400).json({ error: "Invalid input values" });
@@ -186,11 +245,19 @@ app.post('/cellular-system', async (req, res) => {
     3. Frequency Reuse Distance (D) = Cell Radius × sqrt(3 × N)  
 
     Return ONLY a raw JSON object with the following fields (no markdown or code formatting):
+    Write a short, 3-step summary of how data flows through this system and add the formula for each step. 
+    Use simple language for a student to understand.
+    Number the steps and keep it short.
+    
     {
       "channelsPerCell": number,
       "systemCapacity": number,
       "reuseDistance": number,
-      "summary": "Short explanation of the steps taken in the calculation"
+      "steps": [
+        "Step 1: Explain how you got channels per cell...",
+        "Step 2: Explain how you got total system capacity...",
+        "Step 3: Explain how you got reuse distance..."
+      ]
     }
   `;
 
@@ -206,12 +273,15 @@ app.post('/cellular-system', async (req, res) => {
 
     const data = JSON.parse(cleanedText);
 
-    res.json(data); 
+    res.json(data);
   } catch (err) {
     console.error("Gemini API Error:", err);
     res.status(500).json({ error: "Gemini API failed" });
   }
 });
+
+
+
 
 
 
