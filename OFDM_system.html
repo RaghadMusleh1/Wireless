@@ -2,37 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OFDM System Parameters</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pageStyle.css">
 </head>
 
 <body>
   <div class="container">
-    <h1>OFDM System Parameters</h1>
-    
-    <form id="ofdmForm">
-      <section class="form-section">
-        <div class="main-block">
+    <h1 style="text-align: center;text-align: center;align-items: center; display: flex; justify-content: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; background-color:#3a6ea5; width: 1485px; height: 100px; color: white;">
+      OFDM System Parameters</h1>
+    <div style="padding-top: 130px;"></div>
+
+    <div class="top">
+      <div class="form-row">
+        <div class="form-group">
           <label for="rbBandwidth">Resource Block (RB) Bandwidth (kHz):</label>
           <input type="number" id="rbBandwidth" name="rbBandwidth" min="1" required>
         </div>
 
-        <div class="main-block">
+        <div class="form-group">
           <label for="subcarrierSpacing">Subcarrier Spacing (kHz):</label>
           <input type="number" id="subcarrierSpacing" name="subcarrierSpacing" min="1" required>
         </div>
+      </div>
 
-        <div class="main-block">
+      <div class="form-row">
+        <div class="form-group">
           <label for="numSymbols">Number of OFDM Symbols per RB:</label>
           <input type="number" id="numSymbols" name="numSymbols" min="1" required>
         </div>
 
-        <div class="main-block">
+        <div class="form-group">
           <label for="rbDuration"> RB Duration (ms):</label>
           <input type="text" id="rbDuration" name="rbDuration" required>
         </div>
+      </div>
 
-        <div class="main-block">
+      <div class="form-row">
+        <div class="form-group">
           <label for="modulationType">Modulation Type:</label>
           <select id="modulationType" name="modulationType" required>
             <option value="">Select modulation</option>
@@ -43,32 +50,34 @@
           </select>
         </div>
 
-        <div class="main-block">
+        <div class="form-group">
           <label for="parallelBlocks">Parallel Transmission Blocks:</label>
           <input type="number" id="parallelBlocks" name="parallelBlocks" min="1" required>
         </div>
-      </section>
-
-      <div class="button-group">
-        <button type="submit">Submit</button>
-        <button type="button" onclick="summarizeOFDM()">Summarize Process</button>
-        <button class="nav-button fixed-back-button" onclick="goTo('index.html')">← Back</button>
-    
       </div>
-
-      <section class="results-section">
-        <h2>Results</h2>
-        <div class="main-block">
-          <label for="outputs">System Results:</label>
-          <div id="outputs" class="output">—</div>
-        </div>
-      </section>
-      <section class="summary-section"> 
-        <div id="summary" class="summary-output"></div>
-      </section>
-    </form>
+      <button type="button" onclick="summarizeOFDM()">Calculate</button>
+    </div>
+    <button style="background-color: #3a6ea5; width: 100px;" onclick="window.location.href='index.html'">Back</button>
   </div>
 
-  <script src="ofdm_script.js"></script>
+  <!-- Error Box -->
+  <div id="errorBox" class="draggable-box">
+    <div class="box-header" id="errorHeader">
+      <span>Error</span>
+      <span class="close-btn" onclick="closeErrorBox()">&times;</span>
+    </div>
+    <div class="box-body"></div>
+  </div>
+
+  <!-- Result Box -->
+  <div id="resultBox" class="draggable-box">
+    <div class="box-header" id="resultHeader">
+      <span>Calculation Result</span>
+      <span class="close-btn" onclick="closeResultBox()">&times;</span>
+    </div>
+    <div class="box-body" id="resultContent"></div>
+  </div>
+
+  <script type="module" src="ofdm_script.js"></script>
 </body>
 </html>
