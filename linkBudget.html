@@ -16,13 +16,12 @@
     <div class="top">
       <div class="form-row">
         <div class="form-group">
-          <label>Transmitted Power</label>
+          <label>Noise Figure</label>
           <div>
-            <input type="number" id="pt">
-            <select id="ptUnit" style="height:30px; width: 60px;">
-              <option value="dBm">dBm</option>
+            <input type="number" id="nf">
+            <select id="nfUnit" style="height:30px; width: 60px;">
               <option value="dB">dB</option>
-              <option value="watt">watt</option>
+              <option value="unitless">unitless</option>
             </select>
           </div>
         </div>
@@ -35,6 +34,28 @@
               <option value="dBm">dBm</option>
               <option value="dB">dB</option>
               <option value="watt">watt</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bit Rate</label>
+          <div>
+            <input type="number" id="br">
+            <select id="brUnit" style="height:30px; width: 60px;">
+              <option value="bps">bps</option>
+              <option value="bps">Kbps</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>E<sub>b</sub> / N<sub>0</sub></label>
+          <div>
+            <input type="number" id="eb/n0">
+            <select id="eb/n0Unit" style="height:30px; width: 60px;">
             </select>
           </div>
         </div>
@@ -92,8 +113,13 @@
       </div>
       <div class="form-row">
         <div>
-          <button style="width: 400px;" onclick="calculateLinkBudget() ">Calculate</button>
-        <select id="unitType" style="height: 30px;width: 60px;">
+          <button style="width: 400px;" onclick="calculateLinkBudget() ">Calculate for Pr and Pt</button>
+        <select id="prType" style="height: 30px;width: 60px;">
+          <option value="dbm">dBm</option>
+          <option value="db">dB</option>
+          <option value="watt">Watt</option>
+        </select>
+        <select id="ptType" style="height: 30px;width: 60px;">
           <option value="dbm">dBm</option>
           <option value="db">dB</option>
           <option value="watt">Watt</option>
