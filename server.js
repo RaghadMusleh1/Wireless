@@ -133,6 +133,7 @@ app.post('/link-budget', async (req, res) => {
     Pr_db, 
     Pt,
     Lp_dB, 
+    M,
     grUnit ,gtUnit , lsUnit, brUnit, nfUnit
   } = req.body;
 
@@ -151,6 +152,7 @@ app.post('/link-budget', async (req, res) => {
 - Nf = ${Nf} ${nfUnit} (Noise Figure)
 - br = ${br} ${brUnit} (Bit Rate)
 - Eb/N0 = ${ebn0} (linear ratio)
+- M = ${M}
 - Constants: k = 1.38e-23 J/K, T = 290 K
 
   In few words (no more than 50), summarize how data flows through this system. For each stage, briefly mention what happens and show the data rate before and after.
@@ -163,7 +165,6 @@ app.post('/link-budget', async (req, res) => {
     const response = await result.response;
     const text = await response.text();
 
-    // ✅ نرجع النص مباشرة بدون تحويل JSON
     res.json({ summary: text });
 
   } catch (err) {
@@ -238,7 +239,7 @@ app.post('/cellular-system', async (req, res) => {
   `;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = (await response.text()).trim();
