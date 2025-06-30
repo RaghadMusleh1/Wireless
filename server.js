@@ -51,9 +51,8 @@ app.post('/summarize', async (req, res) => {
   - Burst formatting output: ${burstFormattingOut} kbps
   - Modulation output (symbol rate): ${modulationOut} ksym/s
 
-  Write a short, 5-step summary of how data flows through this system. For each stage, briefly mention what happens and show the data rate before and after.
-  Use simple language for a student to understand.
-  Number the steps and keep it short.
+  In few words (no more than 50) summarize how data flows through this system. For each stage, briefly mention what happens and show the data rate before and after.
+  Use simple language.
   `;
 
 
@@ -83,7 +82,8 @@ app.post('/summarizeofdm', async (req, res) => {
           numSubcarriers,
           totalBitsPerSymbol,
           totalBitsPerRB,
-          transmissionRatebps } = req.body;
+          transmissionRatebps,
+          spectralEfficiency } = req.body;
 
   const prompt = `
   Given the following OFDM system parameters:
@@ -91,7 +91,7 @@ app.post('/summarizeofdm', async (req, res) => {
   - resource block Bandwidth: ${rbBandwidth} kHz
   - Subcarrier spacing: ${subcarrierSpacing} khz
   - number of ofdm symbols per resource block: ${numSymbols} 
-  - resource block duration: ${rbDuration}
+  - resource block duration: ${rbDuration} ms
   - Modulation type: ${modulationType}
   - number of parallel  resource blocks that are used for transmission: ${parallelBlocks}
 
@@ -100,10 +100,10 @@ app.post('/summarizeofdm', async (req, res) => {
   - total bits per ofdm symbol: ${totalBitsPerSymbol} 
   - total bits per resource block: ${totalBitsPerRB} 
   - Max transmission rate based on the parallel resource blocks: ${transmissionRatebps} Mbps
+  - Spectral efficiency: ${spectralEfficiency} bps/Hz
 
-  Write a short, 5-step summary of how data flows through this system and the numbers after each step. 
-  Use simple language for a student to understand.
-  Number the steps and keep it short.
+  In few words  (no more than 50) summarize how data flows through this system and the numbers after each step. 
+  Use simple language.
   `;
 
 
@@ -111,7 +111,7 @@ app.post('/summarizeofdm', async (req, res) => {
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
       const result = await model.generateContent(prompt);
       const response = await result.response;
-      const text = await response.text();
+      const text = await response.text(); // Need to await this call
 
       res.json({ summary: text });
     } catch (err) {
@@ -120,80 +120,56 @@ app.post('/summarizeofdm', async (req, res) => {
     }
 });
 
-
 app.post('/link-budget', async (req, res) => {
-  let { Pt, Gt, Gr, d, f, Ls, lsUnit, freqUnit, dUnit, grUnit, gtUnit, ptUnit, unitType} = req.body;
-
-  if (dUnit === 'm') d = d / 1000;
-
-  if (freqUnit === 'GHz') f = f * 1000;
-  if (freqUnit === 'KHz') f = f / 1000;
-
-  const toDbm = (value, unit) => {
-    if (unit === 'watt') return 10 * Math.log10(value * 1000);
-    if (unit === 'dbm') return v - 30; 
-    return parseFloat(value); 
-  };
-
-  Pt = toDbm(Pt, ptUnit);
-  Gt = toDbm(Gt, gtUnit);
-  Gr = toDbm(Gr, grUnit);
-  Ls = toDbm(Ls, lsUnit);
-
-  const Lp = 20 * Math.log10(d) + 20 * Math.log10(f) + 32.44;
-  const Pr = Pt + Gt + Gr - Lp - Ls;
-
-  if (unitType === 'dbm') Pr = Pr + 30;
-  if (unitType === 'watt') Pr = Math.pow(10, (Pr + 30) / 10) / 1000;
+  let {
+    Gt,
+    Gr,
+    ebn0,
+    Nf,
+    br,
+    d,
+    f,
+    Ls,
+    Pr_db, 
+    Pt,
+    Lp_dB, 
+    grUnit ,gtUnit , lsUnit, brUnit, nfUnit
+  } = req.body;
 
   const prompt = `
-  Inputs for received power (Pr) calculation:
+  We are analyzing the calculation of received power (Pr) and required transmit power (Pt) in a communication system.
 
-  Pt = ${Pt}
-  Gt = ${Gt}
-  Gr = ${Gr}
-  d = ${d} km
-  f = ${f} MHz
-  Ls = ${Ls}
+  Given Inputs:
+- Gt = ${Gt} ${gtUnit} (Transmitter Antenna Gain)
+- Gr = ${Gr} ${grUnit} (Receiver Antenna Gain)
+- Pr = ${Pr_db} dB
+- LP = ${Lp_dB} dB
+- Pt = ${Pt} dB
+- d = ${d} (Distance in Km)
+- f = ${f}  (Frequency in MHz)
+- Ls = ${Ls} ${lsUnit}
+- Nf = ${Nf} ${nfUnit} (Noise Figure)
+- br = ${br} ${brUnit} (Bit Rate)
+- Eb/N0 = ${ebn0} (linear ratio)
+- Constants: k = 1.38e-23 J/K, T = 290 K
 
-  The formulas used are:
-  Lp = 20 * log10(d) + 20 * log10(f) + 32.44
-  Pr = Pt + Gt + Gr - Lp - Ls
+  In few words (no more than 50), summarize how data flows through this system. For each stage, briefly mention what happens and show the data rate before and after.
+  Use simple language, show the calculated numbers in the paragraph.
+`;
 
-  Write a short, 2-step summary of how data flows through this system and the numbers after each step.
-  Use simple language for a student to understand.
-  Number the steps clearly and return ONLY a raw JSON object with the following fields and no extra text or formatting:
-  {
-    "summary": [
-      "Step 1: description with value",
-      "Step 2: description with value",
-    ],
-    "pr" : ${Pr}
-  }`;
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
 
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = (await response.text()).trim();
+    // ✅ نرجع النص مباشرة بدون تحويل JSON
+    res.json({ summary: text });
 
-      const cleanedText = text
-        .replace(/```json\s*/g, '')
-        .replace(/```/g, '');
-
-      let data;
-      try {
-        data = JSON.parse(cleanedText);
-      } catch (parseError) {
-        console.error("JSON Parse Error:", cleanedText);
-        return res.status(500).json({ error: "Failed to parse Gemini response." });
-      }
-
-      res.json(data);
-    } catch (err) {
-      console.error("Gemini API Error:", err);
-      res.status(500).json({ error: "Gemini API failed" });
-    }
+  } catch (err) {
+    console.error('❌ Gemini Error:', err);
+    res.status(500).json({ summary: 'Error generating summary with Gemini.' });
+  }
 });
 
 
