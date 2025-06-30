@@ -15,10 +15,25 @@ async function calculate() {
   const cellRadius = parseFloat(document.getElementById("r").value);
   const rUnit = document.getElementById("rUnit").value;
 
-  if ([totalBW, channelBW, numberOfCells, reuseFactor, cellRadius].some(isNaN)) {
-    showErrorBox("❌ Please enter valid numeric values in all fields.");
-    return;
+  const inputs = [
+    { name: "Total Bandwidth", value: totalBW },
+    { name: "Channel Bandwidth", value: channelBW },
+    { name: "Number of Cells", value: numberOfCells },
+    { name: "Reuse Factor", value: reuseFactor },
+    { name: "Cell Radius", value: cellRadius }
+  ];
+
+  for (const input of inputs) {
+    if (isNaN(input.value)) {
+      showErrorBox(`❌ Please enter a valid number for "${input.name}".`);
+      return;
+    }
+    if (input.value <= 0) {
+      showErrorBox(`❌ "${input.name}" must be greater than 0.`);
+      return;
+    }
   }
+
 
   try {
   const response = await fetch('/cellular-system', {
