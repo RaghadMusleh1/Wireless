@@ -1,16 +1,12 @@
 //wireless system script  
-  
-  function goTo(page) {
-      window.location.href = page;
-  }
 
-  document.getElementById('wirelessForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+function calculate(){
+
      /*sampler*/
     const bandwidth = parseFloat(document.getElementById('bandwidth').value);
     if (isNaN(bandwidth) || bandwidth <= 0) {
-      document.getElementById('result').textContent = "Please enter a valid, positive bandwidth value.";
-      return;
+      showErrorBox("Please enter a valid, positive bandwidth value.");
+      return false;
     }
     const nyquistRate = bandwidth * 2;
     document.getElementById('result').textContent = 
@@ -19,9 +15,8 @@
        /*quantizer*/
     const quantizerBits = parseInt(document.getElementById('quantizer').value);
     if (isNaN(quantizerBits) || quantizerBits < 1) {
-      document.getElementById('result').textContent = 
-        " | Please enter a valid number of quantizer bits.";
-      return;
+      showErrorBox("Please enter a valid number of quantizer bits."); 
+      return false;
     }
     const quantizerOutput = quantizerBits * nyquistRate
     document.getElementById('quantizer_res').textContent = 
@@ -35,14 +30,14 @@
       if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parseFloat(parts[1]) !== 0) {
         Rs = parseFloat(parts[0]) / parseFloat(parts[1]);
       } else {
-        document.getElementById('src_encoder_res').textContent = "Please enter a valid Rs value (e.g., 0.5 or 1/2).";
-        return;
+        showErrorBox("Please enter a valid Rs value (e.g., 0.5 or 1/2).");
+        return false;
       }
     } else {
       Rs = parseFloat(Rs_input);
       if (isNaN(Rs) || Rs < 0) {
-        document.getElementById('src_encoder_res').textContent = "Please enter a valid Rs value (e.g., 0.5 or 1/2).";
-        return;
+        showErrorBox("Please enter a valid Rs value (e.g., 0.5 or 1/2).");
+        return false;
       }
     }
     const src_encoder_out = quantizerOutput * Rs;
@@ -58,14 +53,14 @@
       if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && parseFloat(parts[1]) !== 0) {
         Rc = parseFloat(parts[1]) / parseFloat(parts[0]);
       } else {
-        document.getElementById('channel_encoder_out').textContent = "Please enter a valid Rc value (e.g. 1/2).";
-        return;
+        showErrorBox("Please enter a valid Rc value (e.g. 1/2).");
+        return false;
       }
     } else {
       Rc = parseFloat(Rc_input);
       if (isNaN(Rc) || Rc < 0) {
-        document.getElementById('channel_encoder_out').textContent = "Please enter a valid Rc value (e.g. 1/2).";
-        return;
+        showErrorBox("Please enter a valid Rc value (e.g. 1/2).");
+        return false;
       }
     }
     const channel_encoder_out = src_encoder_out * Rc;
@@ -90,64 +85,79 @@
       ` Burst Formatting Output Rate: ${burst_formatting_out.toFixed(2)} kbps`;
 
 
-
-     /*modulation*/
-   
+      /*modulation*/
     const modulationType = document.getElementById('modulationType').value;
-    let bitsPerSymbol;
+    let bitsPerSubcarrier;
     switch (modulationType) {
       case 'QPSK':
-      bitsPerSymbol = 2;
-      break;
+        bitsPerSubcarrier = 2;
+        break;
       case '16-QAM':
-      bitsPerSymbol = 4;
-      break;
+        bitsPerSubcarrier = 4;
+        break;
       case '64-QAM':
-      bitsPerSymbol = 6;
-      break;
+        bitsPerSubcarrier = 6;
+        break;
+      case '1024-QAM':
+        bitsPerSubcarrier = 10;
+        break;
       default:
-      bitsPerSymbol = null;
+        bitsPerSubcarrier = null;
     }
-
-    if (!bitsPerSymbol) {
-      alert('Please select a modulation type.');
-      return;
+    if (!bitsPerSubcarrier) {
+      showErrorBox('Please select a modulation type.');
+      return false;
     }
 
     // Data rate after modulation (remains in kbps)
     const dataRateAfterModulation = burst_formatting_out ; // kbps
+    return true;
 
-    if (!document.getElementById('modulation_out')) {
-      const modDiv = document.createElement('div');
-      modDiv.id = 'modulation_out';
-      modDiv.className = 'output';
-      document.querySelector('.mb-4').appendChild(modDiv);
-    }
+    /*
     document.getElementById('modulation_out').textContent =
       ` Data Rate After Modulation: ${dataRateAfterModulation.toFixed(2)} kbps (${bitsPerSymbol} bits/symbol)`;
-
-  });
+*/
+  }
 
    /* connect to API*/
-    async function summarizeProcess() {
-      // Gather user inputs
-      const bandwidth = document.getElementById('bandwidth').value;
-      const quantizer = document.getElementById('quantizer').value;
-      const Rs = document.getElementById('Rs').value;
-      const Rc = document.getElementById('Rc').value;
-      const modulationType = document.getElementById('modulationType').value;
+  async function summarizeProcess() {
 
-      // Gather calculated results
-      const nyquistRate = document.getElementById('result').textContent;
-      const quantizerRes = document.getElementById('quantizer_res').textContent;
-      const srcEncoderRes = document.getElementById('src_encoder_res').textContent;
-      const channelEncoderOut = document.getElementById('channel_encoder_out').textContent;
-      const interleaverOut = document.getElementById('interleaver_out').textContent;
-      const burstFormattingOut = document.getElementById('burst_formatting_out').textContent;
-      const modulationOut = document.getElementById('modulation_out') ? document.getElementById('modulation_out').textContent : '';
+    const success = calculate(); // returns true or false
+    if (!success) {
+      return; // Stop if calculation failed
+    }
+    
+    // Gather user inputs
+    const bandwidth = document.getElementById('bandwidth').value;
+    const quantizer = document.getElementById('quantizer').value;
+    const Rs = document.getElementById('Rs').value;
+    const Rc = document.getElementById('Rc').value;
+    const modulationType = document.getElementById('modulationType').value;
+
+    /*
+    if ([bandwidth, quantizer, Rs, Rc, modulationType].some(isNaN)) {
+      showErrorBox("Please fill in all fields with valid numbers.");
+      return;
+    }*/
+
+    // Gather calculated results
+    const nyquistRate = document.getElementById('result').textContent;
+    const quantizerRes = document.getElementById('quantizer_res').textContent;
+    const srcEncoderRes = document.getElementById('src_encoder_res').textContent;
+    const channelEncoderOut = document.getElementById('channel_encoder_out').textContent;
+    const interleaverOut = document.getElementById('interleaver_out').textContent;
+    const burstFormattingOut = document.getElementById('burst_formatting_out').textContent;
+    const modulationOut = document.getElementById('modulation_out') ? document.getElementById('modulation_out').textContent : '';
+
+    /*
+    if ([nyquistRate, quantizerRes, srcEncoderRes, channelEncoderOut, interleaverOut,burstFormattingOut].some(isNaN)) {
+      showErrorBox("Please calculate the system parameters first.");
+      return;
+    }*/
+
 
       // Send all data to the backend
-      const response = await fetch('/summarize', {
+    const response = await fetch('/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -163,9 +173,60 @@
           interleaverOut,
           burstFormattingOut,
           modulationOut
-        })
-      });
+      })
+    });
 
-      const data = await response.json();
-      document.getElementById('summary').innerText = data.summary;
+    const data = await response.json();
+    const summary = data.summary; 
+    showResultBox(summary);
+  }
+
+  
+function showErrorBox(message) {
+  const box = document.getElementById('errorBox');
+  box.querySelector('.box-body').innerHTML = message;
+  box.style.display = 'block';
+}
+
+function closeErrorBox() {
+  document.getElementById('errorBox').style.display = 'none';
+}
+
+function showResultBox(htmlMessage) {
+  const box = document.getElementById('resultBox');
+  document.getElementById('resultContent').innerHTML = htmlMessage;
+  box.style.display = 'block';
+}
+
+function closeResultBox() {
+  document.getElementById('resultBox').style.display = 'none';
+}
+
+function makeDraggable(boxId, headerId) {
+  const box = document.getElementById(boxId);
+  const header = document.getElementById(headerId);
+  let offsetX = 0, offsetY = 0, isDragging = false;
+
+  header.onmousedown = function (e) {
+    isDragging = true;
+    offsetX = e.clientX - box.offsetLeft;
+    offsetY = e.clientY - box.offsetTop;
+  };
+
+  document.onmouseup = () => isDragging = false;
+
+  document.onmousemove = function (e) {
+    if (isDragging) {
+      box.style.left = (e.clientX - offsetX) + "px";
+      box.style.top = (e.clientY - offsetY) + "px";
     }
+  };
+}
+
+makeDraggable("errorBox", "errorHeader");
+makeDraggable("resultBox", "resultHeader");
+
+// attach functions to global window so HTML button can access them
+window.summarizeProcess = summarizeProcess;
+window.closeErrorBox = closeErrorBox;
+window.closeResultBox = closeResultBox;
