@@ -3,8 +3,8 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 const ai = new GoogleGenerativeAI("AIzaSyDLEh-QO5r7b9CGRD7oEkv-3sJb2VzkxZU");
 
 async function calculateLinkBudget() {
-  const k = 1.38e-23; // Boltzmann constant (J/K)
-  const T = 290; // standard temperature (Kelvin)
+  const k = 1.38e-23; 
+  const T = 290; 
   let dForBody;
   let fForBody;
 
@@ -100,6 +100,15 @@ async function calculateLinkBudget() {
   const ls = getValue("ls", "System Losses");
   const lsUnit = document.getElementById("lsUnit").value;
   checkForLs(ls, lsUnit);
+
+
+  let M = getValue("m", "System Losses");
+  
+  const mUnit = document.getElementById("mUnit").value;
+  M = toLinear(M , mUnit);
+  // console.log(M , mUnit);
+  // return;
+
   const Ls = toLinear(ls, lsUnit);
   const LS_db = toDb(ls, lsUnit);
 
@@ -107,16 +116,16 @@ async function calculateLinkBudget() {
   const ptAnswerUnit = document.getElementById("ptType").value;
 
   const Lp_dB = calculateLp(d, dUnit, f, freqUnit);
+  console.log(Nf , br , ebn0 , k , T , M);
+  let Pr = (Nf * br * ebn0 * k * T * M);
+  console.log(Pr);
 
-  console.log(Lp_dB);
-  let Pr = (Nf * br * ebn0 * k * T) / Ls;
   if (Pr <= 0) {
     showErrorBox("Received power is too low or invalid");
     throw new Error("Received Power <= 0");
   }
   let Pr_db = toDb(Pr, "watt");
   let Pt = Pr_db - Gt - Gr + LS_db + Lp_dB;
-  console.log(grUnit)
   try {
     f = fForBody;
     d = dForBody;
@@ -124,7 +133,7 @@ async function calculateLinkBudget() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        Gt, Gr, ebn0, Nf, br, d, f, Ls, Pr_db, Pt, Lp_dB, grUnit,gtUnit, lsUnit, brUnit,nfUnit
+        Gt, Gr, ebn0, Nf, br, d, f, Ls, Pr_db, Pt, Lp_dB, M , grUnit,gtUnit, lsUnit, brUnit,nfUnit
       })
     });
 
